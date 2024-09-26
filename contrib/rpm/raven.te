@@ -1,0 +1,81 @@
+policy_module(ftm, 1.100.1)
+
+########################################
+#
+# Declarations
+#
+
+type ftm_t;
+type ftm_exec_t;
+init_daemon_domain(ftm_t, ftm_exec_t)
+
+permissive ftm_t;
+
+type ftm_initrc_exec_t;
+init_script_file(ftm_initrc_exec_t)
+
+type ftm_conf_t;
+files_type(ftm_conf_t)
+
+type ftm_var_lib_t;
+files_type(ftm_var_lib_t)
+
+type ftm_var_run_t;
+files_type(ftm_var_run_t)
+
+type ftm_port_t;
+corenet_port(ftm_port_t)
+
+########################################
+#
+# ftm local policy
+#
+allow ftm_t self:process { fork };
+
+allow ftm_t self:fifo_file rw_fifo_file_perms;
+allow ftm_t self:unix_stream_socket create_stream_socket_perms;
+
+manage_dirs_pattern(ftm_t, ftm_conf_t, ftm_conf_t)
+manage_files_pattern(ftm_t, ftm_conf_t, ftm_conf_t)
+
+manage_dirs_pattern(ftm_t, ftm_var_lib_t, ftm_var_lib_t)
+manage_files_pattern(ftm_t, ftm_var_lib_t, ftm_var_lib_t)
+files_var_lib_filetrans(ftm_t, ftm_var_lib_t, { dir file })
+
+manage_dirs_pattern(ftm_t, ftm_var_run_t, ftm_var_run_t)
+manage_files_pattern(ftm_t, ftm_var_run_t, ftm_var_run_t)
+
+sysnet_dns_name_resolve(ftm_t)
+corenet_all_recvfrom_unlabeled(ftm_t)
+
+allow ftm_t self:tcp_socket create_stream_socket_perms;
+corenet_tcp_sendrecv_generic_if(ftm_t)
+corenet_tcp_sendrecv_generic_node(ftm_t)
+corenet_tcp_sendrecv_all_ports(ftm_t)
+corenet_tcp_bind_generic_node(ftm_t)
+
+gen_require(`
+    type ftm_port_t;
+')
+allow ftm_t ftm_port_t:tcp_socket name_bind;
+
+gen_require(`
+    type ftm_port_t;
+')
+allow ftm_t ftm_port_t:tcp_socket name_connect;
+
+domain_use_interactive_fds(ftm_t)
+
+files_read_etc_files(ftm_t)
+
+miscfiles_read_localization(ftm_t)
+
+sysnet_dns_name_resolve(ftm_t)
+
+allow ftm_t ftm_exec_t:file execute_no_trans;
+allow ftm_t self:process setsched;
+corecmd_exec_ls(ftm_t)
+corenet_tcp_connect_http_port(ftm_t)
+dev_read_urand(ftm_t)
+fs_getattr_xattr_fs(ftm_t)
+kernel_read_system_state(ftm_t)

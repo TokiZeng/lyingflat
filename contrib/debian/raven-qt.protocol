@@ -1,0 +1,11 @@
+[Protocol]
+exec=ftm-qt '%u'
+protocol=ftm
+input=none
+output=none
+helper=true
+listing=
+reading=false
+writing=false
+makedir=false
+deleting=false

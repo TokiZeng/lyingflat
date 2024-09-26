@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=FTM Core
+Comment=Connect to the FTM P2P Network
+Comment[de]=Verbinde mit dem FTM peer-to-peer Netzwerk
+Comment[fr]=FTM, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=FTM, eşten eşe kriptografik sanal para birimi
+Exec=ftm-qt %u
+Terminal=false
+Type=Application
+Icon=ftm128
+MimeType=x-scheme-handler/ftm;
+Categories=Office;Finance;

@@ -1,0 +1,33 @@
+# /etc/conf.d/ftmd: config file for /etc/init.d/ftmd
+
+# Config file location
+#FTMD_CONFIGFILE="/etc/ftm/ftm.conf"
+
+# What directory to write pidfile to?  (created and owned by $FTMD_USER)
+#FTMD_PIDDIR="/var/run/ftmd"
+
+# What filename to give the pidfile
+#FTMD_PIDFILE="${FTMD_PIDDIR}/ftmd.pid"
+
+# Where to write ftmd data (be mindful that the blockchain is large)
+#FTMD_DATADIR="/var/lib/ftmd"
+
+# User and group to own ftmd process
+#FTMD_USER="ftm"
+#FTMD_GROUP="ftm"
+
+# Path to ftmd executable
+#FTMD_BIN="/usr/bin/ftmd"
+
+# Nice value to run ftmd under
+#FTMD_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+#FTMD_OPTS=""
+
+# The timeout in seconds OpenRC will wait for ftmd to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+FTMD_SIGTERM_TIMEOUT=60

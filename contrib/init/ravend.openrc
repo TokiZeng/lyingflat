@@ -1,0 +1,92 @@
+#!/sbin/runscript
+
+# backward compatibility for existing gentoo layout 
+#
+if [ -d "/var/lib/ftm/.ftm" ]; then
+	FTMD_DEFAULT_DATADIR="/var/lib/ftm/.ftm"
+else
+	FTMD_DEFAULT_DATADIR="/var/lib/ftmd"
+fi
+
+FTMD_CONFIGFILE=${FTMD_CONFIGFILE:-/etc/ftm/ftm.conf}
+FTMD_PIDDIR=${FTMD_PIDDIR:-/var/run/ftmd}
+FTMD_PIDFILE=${FTMD_PIDFILE:-${FTMD_PIDDIR}/ftmd.pid}
+FTMD_DATADIR=${FTMD_DATADIR:-${FTMD_DEFAULT_DATADIR}}
+FTMD_USER=${FTMD_USER:-${FTM_USER:-ftm}}
+FTMD_GROUP=${FTMD_GROUP:-ftm}
+FTMD_BIN=${FTMD_BIN:-/usr/bin/ftmd}
+FTMD_NICE=${FTMD_NICE:-${NICELEVEL:-0}}
+FTMD_OPTS="${FTMD_OPTS:-${FTM_OPTS}}"
+
+name="FTM Core Daemon"
+description="FTM cryptocurrency P2P network daemon"
+
+command="/usr/bin/ftmd"
+command_args="-pid=\"${FTMD_PIDFILE}\" \
+		-conf=\"${FTMD_CONFIGFILE}\" \
+		-datadir=\"${FTMD_DATADIR}\" \
+		-daemon \
+		${FTMD_OPTS}"
+
+required_files="${FTMD_CONFIGFILE}"
+start_stop_daemon_args="-u ${FTMD_USER} \
+			-N ${FTMD_NICE} -w 2000"
+pidfile="${FTMD_PIDFILE}"
+
+# The retry schedule to use when stopping the daemon. Could be either
+# a timeout in seconds or multiple signal/timeout pairs (like
+# "SIGKILL/180 SIGTERM/300")
+retry="${FTMD_SIGTERM_TIMEOUT}"
+
+depend() {
+	need localmount net
+}
+
+# verify
+# 1) that the datadir exists and is writable (or create it)
+# 2) that a directory for the pid exists and is writable
+# 3) ownership and permissions on the config file
+start_pre() {
+	checkpath \
+	-d \
+	--mode 0750 \
+	--owner "${FTMD_USER}:${FTMD_GROUP}" \
+	"${FTMD_DATADIR}"
+
+	checkpath \
+	-d \
+	--mode 0755 \
+	--owner "${FTMD_USER}:${FTMD_GROUP}" \
+	"${FTMD_PIDDIR}"
+
+	checkpath -f \
+	-o ${FTMD_USER}:${FTMD_GROUP} \
+	-m 0660 \
+	${FTMD_CONFIGFILE}
+
+	checkconfig || return 1
+}
+
+checkconfig()
+{
+	if ! grep -qs '^rpcpassword=' "${FTMD_CONFIGFILE}" ; then
+		eerror ""
+		eerror "ERROR: You must set a secure rpcpassword to run ftmd."
+		eerror "The setting must appear in ${FTMD_CONFIGFILE}"
+		eerror ""
+		eerror "This password is security critical to securing wallets "
+		eerror "and must not be the same as the rpcuser setting."
+		eerror "You can generate a suitable random password using the following "
+		eerror "command from the shell:"
+		eerror ""
+		eerror "bash -c 'tr -dc a-zA-Z0-9 < /dev/urandom | head -c32 && echo'"
+		eerror ""
+		eerror "It is recommended that you also set alertnotify so you are "
+		eerror "notified of problems:"
+		eerror ""
+		eerror "ie: alertnotify=echo %%s | mail -s \"FTM Alert\"" \
+			"admin@foo.com"
+		eerror ""
+		return 1
+	fi
+}

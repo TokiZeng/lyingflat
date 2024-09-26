@@ -1,0 +1,6 @@
+usr/local/bin/ftm-qt usr/bin
+share/pixmaps/ftm32.xpm usr/share/pixmaps
+share/pixmaps/ftm16.xpm usr/share/pixmaps
+share/pixmaps/ftm128.png usr/share/pixmaps
+debian/ftm-qt.desktop usr/share/applications
+debian/ftm-qt.protocol usr/share/kde4/services/

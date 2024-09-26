@@ -1,0 +1,22 @@
+[Unit]
+Description=FTM's distributed currency daemon
+After=network.target
+
+[Service]
+User=ftm
+Group=ftm
+
+Type=forking
+PIDFile=/var/lib/ftmd/ftmd.pid
+ExecStart=/usr/bin/ftmd -daemon -pid=/var/lib/ftmd/ftmd.pid \
+-conf=/etc/ftm/ftm.conf -datadir=/var/lib/ftmd -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target
